@@ -98,8 +98,21 @@ if 'uploaded_image' not in st.session_state:
 if 'manually_marked' not in st.session_state:
     st.session_state.manually_marked = []
 
-# Application title with animated header
-st.markdown('<div class="main-header"><h1>Face Recognition Attendance System</h1></div>', unsafe_allow_html=True)
+# Application title with animated header and logo
+logo_html = '''
+<div class="main-header glow">
+    <div style="display: flex; align-items: center; justify-content: center;">
+        <img src="data:image/svg+xml;base64,{}" style="width:50px; margin-right:10px;">
+        <h1>Smart Attendance System</h1>
+    </div>
+</div>
+'''
+
+# Read and encode logo
+with open('assets/logo.svg', 'rb') as f:
+    logo = base64.b64encode(f.read()).decode()
+
+st.markdown(logo_html.format(logo), unsafe_allow_html=True)
 
 # Sidebar menu
 st.sidebar.title("Menu")
@@ -192,7 +205,7 @@ elif app_mode == "Register New Student":
 
 # Manual Attendance
 elif app_mode == "Manual Attendance":
-    st.markdown("## Manual Attendance")
+    st.markdown('<div class="glass-panel"><h2>Manual Attendance</h2></div>', unsafe_allow_html=True)
     
     students = get_registered_students()
     
@@ -236,7 +249,7 @@ elif app_mode == "Manual Attendance":
 
 # View Attendance
 elif app_mode == "View Attendance":
-    st.markdown("## View Attendance History")
+    st.markdown('<div class="glass-panel"><h2>View Attendance History</h2></div>', unsafe_allow_html=True)
     
     # Date selection
     selected_date = st.date_input("Select Date", datetime.now().date())
