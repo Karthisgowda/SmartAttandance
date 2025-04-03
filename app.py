@@ -128,7 +128,7 @@ else:
     index = None
 
 app_mode = st.sidebar.selectbox("Choose Mode:", 
-                               ["Home", "Register New Student", "Manual Attendance", "View Attendance"],
+                               ["Home", "Register New Student", "Manual Attendance", "View Attendance", "XAMPP Version"],
                                index=index,
                                key="app_mode_select")
 
@@ -200,7 +200,7 @@ elif app_mode == "Register New Student":
                 st.session_state.current_mode = "Home"
                 time.sleep(1)
                 # Redirect to Home page
-                st.sidebar.selectbox("Choose Mode:", ["Home", "Register New Student", "Manual Attendance", "View Attendance"], index=0)
+                st.sidebar.selectbox("Choose Mode:", ["Home", "Register New Student", "Manual Attendance", "View Attendance", "XAMPP Version"], index=0)
                 st.rerun()
 
 # Manual Attendance
@@ -298,3 +298,99 @@ elif app_mode == "View Attendance":
         )
     else:
         st.info("No attendance records found.")
+
+# XAMPP Version
+elif app_mode == "XAMPP Version":
+    st.markdown('<div class="glass-panel"><h2>XAMPP Version</h2></div>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="stcard">
+        <h3>About XAMPP Version</h3>
+        <p>This is a special version of the Face Recognition Attendance System designed to run on XAMPP (Apache, MySQL, PHP).</p>
+        <p>If you want to deploy this system on a web server or locally using XAMPP, this version is for you!</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        <div class="stcard">
+            <h3>Features</h3>
+            <ul class="feature-list">
+                <li>Similar user interface with dark theme</li>
+                <li>Uses MySQL database instead of CSV files</li>
+                <li>Student registration with photo upload</li>
+                <li>Attendance marking system</li>
+                <li>Records viewing and export</li>
+                <li>Data import from Streamlit version</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div class="stcard">
+            <h3>Requirements</h3>
+            <ul class="feature-list">
+                <li>XAMPP installed on your system</li>
+                <li>Web browser</li>
+                <li>Basic knowledge of web hosting</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("### Download XAMPP Version")
+    
+    # Provide download for the XAMPP version
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        try:
+            with open("xampp_version/face_recognition_attendance_system_xampp_version.zip", "rb") as fp:
+                btn1 = st.download_button(
+                    label="Download ZIP Version",
+                    data=fp,
+                    file_name="face_recognition_attendance_system_xampp_version.zip",
+                    mime="application/zip",
+                )
+        except FileNotFoundError:
+            st.warning("ZIP version not available. Please use the TAR.GZ version instead.")
+    
+    with col2:
+        try:
+            with open("xampp_version/face_recognition_attendance_system_xampp_version.tar.gz", "rb") as fp:
+                btn2 = st.download_button(
+                    label="Download TAR.GZ Version",
+                    data=fp,
+                    file_name="face_recognition_attendance_system_xampp_version.tar.gz",
+                    mime="application/gzip",
+                )
+        except FileNotFoundError:
+            st.warning("TAR.GZ version not available. Please use the ZIP version instead.")
+    
+    st.markdown("""
+    ### Installation Instructions
+    
+    1. Download and extract the ZIP file
+    2. For Windows users: Run `install.bat` to automatically install to XAMPP
+    3. For Mac/Linux users: Run `install.sh` to install to XAMPP
+    4. Start XAMPP services (Apache and MySQL)
+    5. Create the database using phpMyAdmin
+    6. Import `database_setup.sql` to set up the tables
+    7. Access the application at http://localhost/attendance_system
+    
+    For detailed instructions, refer to the README.txt file included in the download.
+    """)
+    
+    # Data Migration
+    st.markdown("### Data Migration")
+    st.markdown("""
+    If you want to migrate your data from this Streamlit app to the XAMPP version:
+    
+    1. Download your attendance history using the "Download Attendance History" button in the View Attendance page
+    2. Import this CSV file using the "Import Data" option in the XAMPP version
+    3. Copy student photos from the `data/student_images` folder to the `uploads` folder in the XAMPP installation
+    
+    The XAMPP version includes tools to help with this migration process.
+    """)

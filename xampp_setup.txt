@@ -1,0 +1,98 @@
+# Face Recognition Attendance System - XAMPP Version Setup Instructions
+
+## How to Run on XAMPP
+
+### Step 1: Database Setup
+1. Start XAMPP Control Panel and ensure Apache and MySQL services are running
+2. Access phpMyAdmin at http://localhost/phpmyadmin
+3. Create a new database named `attendance_system`
+4. Execute the following SQL to create the required tables:
+
+-- Create students table
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    photo_path VARCHAR(255)
+);
+
+-- Create attendance table
+CREATE TABLE attendance (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+### Step 2: Create Folder Structure
+1. Create a folder named `attendance_system` in your XAMPP htdocs directory:
+   - Windows: C:\xampp\htdocs\attendance_system\
+   - Mac: /Applications/XAMPP/htdocs/attendance_system/
+   - Linux: /opt/lampp/htdocs/attendance_system/
+
+2. Inside this folder, create the following subfolders:
+   - uploads (for student photos)
+   - css (for stylesheet files)
+   - js (for JavaScript files)
+
+### Step 3: Create PHP Files
+1. Create the following PHP files in your attendance_system folder:
+
+- db_connection.php: Database connection file
+- index.php: Main dashboard page
+- header.php: Common header for all pages
+- footer.php: Common footer for all pages
+- register.php: Student registration page
+- attendance.php: Mark attendance page
+- view.php: View attendance records
+- export.php: Export attendance as CSV
+
+2. Add the CSS and JavaScript files to their respective folders
+
+### Step 4: Database Connection
+Use this code for db_connection.php:
+
+<?php
+// Database connection settings
+$servername = "localhost";
+$username = "root";     // Default XAMPP username
+$password = "";         // Default XAMPP password is empty
+$dbname = "attendance_system";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+### Step 5: Migrating from Streamlit
+1. Export your attendance records from the Streamlit app using the "Download Attendance History" button
+2. Copy student photos from data/faces/ to the uploads/ folder
+3. You'll need to manually import the student data into the MySQL database
+
+### Step 6: Access the Application
+After setting everything up, access your application at:
+http://localhost/attendance_system
+
+## PHP Files Structure Reference
+
+The PHP application should include the following main files:
+1. index.php - Main dashboard with menu cards
+2. register.php - Form to register students with photo upload
+3. attendance.php - Page to mark attendance manually
+4. view.php - View attendance by date and overall records
+5. export.php - Download attendance as CSV
+
+Each page should implement these features:
+- index.php: Dashboard with navigation cards to other pages
+- register.php: Form with name input and photo upload
+- attendance.php: Dropdown to select student and mark present
+- view.php: Date selector and attendance table display
+
+## Security Considerations
+- Set proper file permissions for uploads folder
+- Validate all form inputs to prevent SQL injection
+- For production use, set a MySQL password
