@@ -96,7 +96,21 @@ st.title("Face Recognition Attendance System")
 
 # Sidebar menu
 st.sidebar.title("Menu")
-app_mode = st.sidebar.selectbox("Choose Mode:", ["Home", "Register New Student", "Manual Attendance", "View Attendance"])
+# Use session state for app mode to maintain selection across reruns
+if 'app_mode' not in st.session_state:
+    st.session_state.app_mode = "Home"
+
+# Get the app mode from session state if we're redirecting from registration
+if st.session_state.current_mode == "Home":
+    index = 0
+    st.session_state.current_mode = st.session_state.app_mode
+else:
+    index = None
+
+app_mode = st.sidebar.selectbox("Choose Mode:", 
+                               ["Home", "Register New Student", "Manual Attendance", "View Attendance"],
+                               index=index,
+                               key="app_mode_select")
 
 # Home Page
 if app_mode == "Home":
@@ -147,7 +161,11 @@ elif app_mode == "Register New Student":
                 st.session_state.students = get_registered_students()
                 
                 st.success(f"Student {student_name} registered successfully!")
-                time.sleep(2)
+                # Set mode to Home for redirection
+                st.session_state.current_mode = "Home"
+                time.sleep(1)
+                # Redirect to Home page
+                st.sidebar.selectbox("Choose Mode:", ["Home", "Register New Student", "Manual Attendance", "View Attendance"], index=0)
                 st.rerun()
 
 # Manual Attendance
