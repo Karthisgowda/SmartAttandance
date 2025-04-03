@@ -15,6 +15,13 @@ st.set_page_config(
     layout="wide"
 )
 
+# Load custom CSS
+def load_css():
+    with open("style.css") as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+        
+load_css()
+
 # Create necessary directories if they don't exist
 os.makedirs("data/student_images", exist_ok=True)
 os.makedirs("data/attendance", exist_ok=True)
@@ -91,8 +98,8 @@ if 'uploaded_image' not in st.session_state:
 if 'manually_marked' not in st.session_state:
     st.session_state.manually_marked = []
 
-# Application title
-st.title("Face Recognition Attendance System")
+# Application title with animated header
+st.markdown('<div class="main-header"><h1>Face Recognition Attendance System</h1></div>', unsafe_allow_html=True)
 
 # Sidebar menu
 st.sidebar.title("Menu")
@@ -114,27 +121,40 @@ app_mode = st.sidebar.selectbox("Choose Mode:",
 
 # Home Page
 if app_mode == "Home":
-    st.markdown("## Welcome to the Attendance System")
-    st.markdown("""
-    This application allows you to:
+    st.markdown('<div class="welcome-message"><h2>Welcome to the Smart Attendance System</h2></div>', unsafe_allow_html=True)
     
-    * Register new students to the system
-    * Manually mark attendance
-    * View attendance history
+    # Create a card layout
+    st.markdown('<div class="card-grid">', unsafe_allow_html=True)
     
-    ### Currently Registered Students
-    """)
+    # Feature card
+    st.markdown('''
+    <div class="stcard">
+        <h3>System Features</h3>
+        <ul class="feature-list">
+            <li>Register students with photo identification</li>
+            <li>Mark attendance with just one click</li>
+            <li>View daily attendance records</li>
+            <li>Generate attendance reports and analytics</li>
+        </ul>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown("### Currently Registered Students")
     
     students = get_registered_students()
     if students:
+        st.markdown('<div class="student-list">', unsafe_allow_html=True)
         for student in students:
-            st.write(f"- {student}")
+            st.markdown(f'<div class="student-item">{student}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.info("No students registered yet. Go to 'Register New Student' to add students.")
 
 # Register New Student
 elif app_mode == "Register New Student":
-    st.markdown("## Register New Student")
+    st.markdown('<div class="registration-form"><h2>Register New Student</h2></div>', unsafe_allow_html=True)
     
     # Input for the name
     student_name = st.text_input("Enter Student's Name:")
@@ -153,8 +173,10 @@ elif app_mode == "Register New Student":
             
             # Register button
             if st.button("Register Student"):
-                # Save the image
+                # Save the image - convert to RGB to handle transparency
                 image_path = os.path.join("data/student_images", f"{student_name}.jpg")
+                if image.mode == 'RGBA':
+                    image = image.convert('RGB')
                 image.save(image_path)
                 
                 # Update registered students list
@@ -206,7 +228,7 @@ elif app_mode == "Manual Attendance":
                 today_df = pd.read_csv(file_path)
                 if not today_df.empty:
                     for _, row in today_df.iterrows():
-                        st.write(f"✅ {row['Name']} - {row['Time']}")
+                        st.markdown(f'<div class="attendance-mark">✅ {row["Name"]} - {row["Time"]}</div>', unsafe_allow_html=True)
                 else:
                     st.info("No attendance marked yet for today")
             else:
