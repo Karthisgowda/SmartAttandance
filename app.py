@@ -347,9 +347,9 @@ elif app_mode == "XAMPP Version":
     
     with col1:
         try:
-            with open("xampp_version/face_recognition_attendance_system_xampp_version.zip", "rb") as fp:
+            with open("xampp_version/downloads/face_recognition_attendance_system_xampp_version.zip", "rb") as fp:
                 btn1 = st.download_button(
-                    label="Download ZIP Version",
+                    label="Download ZIP Version (Windows)",
                     data=fp,
                     file_name="face_recognition_attendance_system_xampp_version.zip",
                     mime="application/zip",
@@ -359,9 +359,9 @@ elif app_mode == "XAMPP Version":
     
     with col2:
         try:
-            with open("xampp_version/face_recognition_attendance_system_xampp_version.tar.gz", "rb") as fp:
+            with open("xampp_version/downloads/face_recognition_attendance_system_xampp_version.tar.gz", "rb") as fp:
                 btn2 = st.download_button(
-                    label="Download TAR.GZ Version",
+                    label="Download TAR.GZ Version (Linux/Mac)",
                     data=fp,
                     file_name="face_recognition_attendance_system_xampp_version.tar.gz",
                     mime="application/gzip",
