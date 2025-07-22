@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import time
 import datetime
-from datetime import datetime
+from datetime import datetime, timedelta
 import base64
 from PIL import Image
 import io
@@ -114,8 +114,36 @@ with open('assets/logo.svg', 'rb') as f:
 
 st.markdown(logo_html.format(logo), unsafe_allow_html=True)
 
+# Admin authentication
+def check_admin_password():
+    if 'admin_authenticated' not in st.session_state:
+        st.session_state.admin_authenticated = False
+    return st.session_state.admin_authenticated
+
+def admin_login():
+    with st.sidebar:
+        st.markdown("---")
+        st.subheader("🔐 Admin Access")
+        admin_password = st.text_input("Admin Password", type="password", key="admin_pass")
+        
+        # Get admin password from environment variable or use default
+        correct_password = os.environ.get("ADMIN_PASSWORD", "admin123")
+        
+        if st.button("Login as Admin"):
+            if admin_password == correct_password:
+                st.session_state.admin_authenticated = True
+                st.success("Admin access granted!")
+                st.rerun()
+            else:
+                st.error("Invalid admin password!")
+
 # Sidebar menu
 st.sidebar.title("Menu")
+
+# Admin login section
+if not check_admin_password():
+    admin_login()
+
 # Use session state for app mode to maintain selection across reruns
 if 'app_mode' not in st.session_state:
     st.session_state.app_mode = "Home"
@@ -127,8 +155,13 @@ if st.session_state.current_mode == "Home":
 else:
     index = None
 
+# Show admin panel option only if authenticated
+menu_options = ["Home", "Register New Student", "Manual Attendance", "View Attendance", "XAMPP Version"]
+if check_admin_password():
+    menu_options.append("🔧 Admin Panel")
+
 app_mode = st.sidebar.selectbox("Choose Mode:", 
-                               ["Home", "Register New Student", "Manual Attendance", "View Attendance", "XAMPP Version"],
+                               menu_options,
                                index=index,
                                key="app_mode_select")
 
@@ -394,3 +427,200 @@ elif app_mode == "XAMPP Version":
     
     The XAMPP version includes tools to help with this migration process.
     """)
+
+# Admin Panel
+elif app_mode == "🔧 Admin Panel":
+    if not check_admin_password():
+        st.error("Access denied. Please login as admin first.")
+        st.stop()
+    
+    st.markdown('<div class="glass-panel"><h2>🔧 Admin Panel</h2></div>', unsafe_allow_html=True)
+    
+    # Admin info
+    st.info("Welcome to the Admin Panel. Here you can manage the system and view all data.")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        <div class="stcard">
+            <h3>System Statistics</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        students = get_registered_students()
+        attendance_data = get_all_attendance()
+        
+        st.metric("Total Students", len(students))
+        if not attendance_data.empty:
+            total_records = len(attendance_data)
+            unique_dates = attendance_data['Date'].nunique()
+            st.metric("Total Attendance Records", total_records)
+            st.metric("Active Days", unique_dates)
+        else:
+            st.metric("Total Attendance Records", 0)
+            st.metric("Active Days", 0)
+    
+    with col2:
+        st.markdown("""
+        <div class="stcard">
+            <h3>Quick Actions</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🔄 Refresh System Data"):
+            st.session_state.students = get_registered_students()
+            st.success("System data refreshed successfully!")
+            st.rerun()
+        
+        if st.button("📊 Generate Full Report"):
+            attendance_data = get_all_attendance()
+            if not attendance_data.empty:
+                csv = attendance_data.to_csv(index=False)
+                st.download_button(
+                    label="📥 Download Complete Report",
+                    data=csv,
+                    file_name=f"complete_attendance_report_{datetime.now().strftime('%Y%m%d')}.csv",
+                    mime="text/csv",
+                )
+            else:
+                st.warning("No data available for report generation.")
+    
+    # Data Management Section
+    st.markdown("### 📋 Data Management")
+    
+    tab1, tab2, tab3 = st.tabs(["Students", "Attendance", "System Backup"])
+    
+    with tab1:
+        st.subheader("Student Management")
+        students = get_registered_students()
+        
+        if students:
+            for student in students:
+                col1, col2, col3 = st.columns([3, 1, 1])
+                
+                with col1:
+                    # Display student photo if available
+                    image_path = os.path.join("data/student_images", f"{student}.jpg")
+                    if os.path.exists(image_path):
+                        img = Image.open(image_path)
+                        st.image(img, caption=student, width=100)
+                    else:
+                        st.write(f"👤 {student}")
+                
+                with col2:
+                    # Count attendance records for this student
+                    if not attendance_data.empty:
+                        student_records = attendance_data[attendance_data['Name'] == student]
+                        st.write(f"Records: {len(student_records)}")
+                    else:
+                        st.write("Records: 0")
+                
+                with col3:
+                    if st.button(f"🗑️ Remove", key=f"remove_{student}"):
+                        # Remove student image
+                        if os.path.exists(image_path):
+                            os.remove(image_path)
+                        
+                        # Remove from attendance records
+                        attendance_files = [f for f in os.listdir("data/attendance") 
+                                          if f.startswith("attendance_") and f.endswith(".csv")]
+                        
+                        for file in attendance_files:
+                            file_path = os.path.join("data/attendance", file)
+                            try:
+                                df = pd.read_csv(file_path)
+                                df = df[df['Name'] != student]
+                                df.to_csv(file_path, index=False)
+                            except:
+                                pass
+                        
+                        st.success(f"Student {student} removed successfully!")
+                        st.rerun()
+        else:
+            st.info("No students registered in the system.")
+    
+    with tab2:
+        st.subheader("Attendance Records")
+        
+        if not attendance_data.empty:
+            # Show recent records
+            st.write("**Recent Attendance Records:**")
+            recent_records = attendance_data.sort_values(['Date', 'Time'], ascending=False).head(10)
+            st.dataframe(recent_records)
+            
+            # Date range selector for bulk operations
+            st.write("**Bulk Operations:**")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                start_date = st.date_input("Start Date", datetime.now().date() - timedelta(days=30))
+            with col2:
+                end_date = st.date_input("End Date", datetime.now().date())
+            
+            if st.button("🗑️ Clear Records in Date Range"):
+                if st.checkbox("I confirm this action (cannot be undone)"):
+                    # Remove records in date range
+                    attendance_files = [f for f in os.listdir("data/attendance") 
+                                      if f.startswith("attendance_") and f.endswith(".csv")]
+                    
+                    removed_count = 0
+                    for file in attendance_files:
+                        file_path = os.path.join("data/attendance", file)
+                        try:
+                            df = pd.read_csv(file_path)
+                            original_count = len(df)
+                            df['Date'] = pd.to_datetime(df['Date']).dt.date
+                            df = df[(df['Date'] < start_date) | (df['Date'] > end_date)]
+                            removed_count += original_count - len(df)
+                            df.to_csv(file_path, index=False)
+                        except:
+                            pass
+                    
+                    st.success(f"Removed {removed_count} records from the selected date range.")
+                    st.rerun()
+        else:
+            st.info("No attendance records found.")
+    
+    with tab3:
+        st.subheader("System Backup & Restore")
+        
+        # Create system backup
+        if st.button("📦 Create Full System Backup"):
+            import zipfile
+            from datetime import datetime
+            
+            backup_filename = f"system_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+            
+            with zipfile.ZipFile(backup_filename, 'w') as backup_zip:
+                # Add all student images
+                for student in get_registered_students():
+                    image_path = os.path.join("data/student_images", f"{student}.jpg")
+                    if os.path.exists(image_path):
+                        backup_zip.write(image_path)
+                
+                # Add all attendance files
+                attendance_files = [f for f in os.listdir("data/attendance") 
+                                  if f.startswith("attendance_") and f.endswith(".csv")]
+                for file in attendance_files:
+                    file_path = os.path.join("data/attendance", file)
+                    backup_zip.write(file_path)
+            
+            with open(backup_filename, "rb") as fp:
+                st.download_button(
+                    label="📥 Download System Backup",
+                    data=fp,
+                    file_name=backup_filename,
+                    mime="application/zip",
+                )
+            
+            # Clean up the backup file
+            os.remove(backup_filename)
+            st.success("System backup created successfully!")
+    
+    # Logout button
+    st.markdown("---")
+    if st.button("🚪 Logout from Admin Panel"):
+        st.session_state.admin_authenticated = False
+        st.success("Logged out successfully!")
+        st.rerun()
