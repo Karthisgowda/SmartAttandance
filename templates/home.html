@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block title %}Home | Smart Attendance{% endblock %}
+{% block content %}
+<section class="grid-two mt-4">
+    <div class="panel">
+        <h2>System Features</h2>
+        <ul class="feature-list">
+            <li>Register students with photo identification</li>
+            <li>Mark attendance in a single click</li>
+            <li>Browse daily and overall attendance history</li>
+            <li>Generate CSV exports and admin backups</li>
+        </ul>
+    </div>
+
+    <div class="panel">
+        <h2>Quick Stats</h2>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <span>Registered Students</span>
+                <strong>{{ students|length }}</strong>
+            </div>
+            <div class="metric-card">
+                <span>Total Records</span>
+                <strong>{{ stats.total_records }}</strong>
+            </div>
+            <div class="metric-card">
+                <span>Active Days</span>
+                <strong>{{ stats.active_days }}</strong>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="panel mt-4">
+    <div class="section-header">
+        <h2>Currently Registered Students</h2>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('register_student') }}">Add Student</a>
+    </div>
+    {% if students %}
+    <div class="student-grid">
+        {% for student in students %}
+        <div class="student-item">{{ student }}</div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No students registered yet. Add one from the Register Student page.</p>
+    {% endif %}
+</section>
+{% endblock %}

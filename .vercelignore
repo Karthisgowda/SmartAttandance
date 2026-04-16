@@ -1,0 +1,13 @@
+attached_assets
+tmp
+.streamlit
+.replit
+replit.md
+replit.nix
+generated-icon.png
+render.yaml
+render-requirements.txt
+Procfile
+db_connection.php
+xampp_setup.txt
+xampp_version_instructions.md

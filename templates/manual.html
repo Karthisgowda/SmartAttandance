@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}Manual Attendance | Smart Attendance{% endblock %}
+{% block content %}
+<section class="grid-two mt-4">
+    <div class="panel form-panel">
+        <h2>Mark Attendance</h2>
+        {% if students %}
+        <form method="post" class="stack">
+            <label for="student_name">Select Student</label>
+            <select id="student_name" name="student_name" class="form-select">
+                {% for student in students %}
+                <option value="{{ student }}">{{ student }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Mark Present</button>
+        </form>
+        {% else %}
+        <p class="empty-state">Register students before marking attendance.</p>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <h2>Today's Attendance</h2>
+        {% if today_records %}
+        <div class="stack">
+            {% for row in today_records %}
+            <div class="attendance-mark">Present: {{ row.Name }} at {{ row.Time }}</div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No attendance marked yet for today.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

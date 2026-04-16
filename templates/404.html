@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}Not Found | Smart Attendance{% endblock %}
+{% block content %}
+<section class="panel mt-4">
+    <h2>Page Not Found</h2>
+    <p>The page you requested does not exist.</p>
+    <a class="btn btn-primary" href="{{ url_for('home') }}">Back to Home</a>
+</section>
+{% endblock %}

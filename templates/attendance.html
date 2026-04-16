@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+{% block title %}Attendance History | Smart Attendance{% endblock %}
+{% block content %}
+<section class="panel form-panel mt-4">
+    <div class="section-header">
+        <h2>View Attendance History</h2>
+        <a class="btn btn-outline-light btn-sm" href="{{ url_for('download_attendance') }}">Download CSV</a>
+    </div>
+    <form method="get" class="inline-form">
+        <label for="date">Select Date</label>
+        <input id="date" name="date" type="date" class="form-control" value="{{ selected_date }}">
+        <button type="submit" class="btn btn-primary">Load</button>
+    </form>
+</section>
+
+<section class="panel mt-4">
+    <h2>Attendance for {{ selected_date }}</h2>
+    {% if selected_records %}
+    <div class="table-responsive">
+        <table class="table table-dark table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Time</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in selected_records %}
+                <tr>
+                    <td>{{ row.Name }}</td>
+                    <td>{{ row.Time }}</td>
+                    <td>{{ row.Date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state">No attendance records for this date.</p>
+    {% endif %}
+</section>
+
+<section class="panel mt-4">
+    <h2>Overall Attendance History</h2>
+    {% if stats.history_table %}
+    <div class="table-responsive">
+        <table class="table table-dark table-striped align-middle">
+            <thead>
+                <tr>
+                    {% for column in stats.history_columns %}
+                    <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in stats.history_table %}
+                <tr>
+                    {% for column in stats.history_columns %}
+                    <td>{{ row[column] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state">No attendance records found.</p>
+    {% endif %}
+</section>
+{% endblock %}

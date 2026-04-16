@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block title %}Admin Login | Smart Attendance{% endblock %}
+{% block content %}
+<section class="panel form-panel mt-4">
+    <h2>Admin Access</h2>
+    <form method="post" class="stack">
+        <label for="password">Admin Password</label>
+        <input id="password" name="password" type="password" class="form-control" required>
+        <button type="submit" class="btn btn-primary">Login as Admin</button>
+    </form>
+</section>
+{% endblock %}

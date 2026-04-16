@@ -1,0 +1,9 @@
+.vercel
+__pycache__/
+*.py[cod]
+*.zip
+system_backup_*.zip
+data/student_images/
+data/attendance/attendance_*.csv
+
+.vercel

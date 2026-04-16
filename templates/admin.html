@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+{% block title %}Admin Panel | Smart Attendance{% endblock %}
+{% block content %}
+<section class="metric-grid mt-4">
+    <div class="metric-card">
+        <span>Total Students</span>
+        <strong>{{ students|length }}</strong>
+    </div>
+    <div class="metric-card">
+        <span>Total Attendance Records</span>
+        <strong>{{ stats.total_records }}</strong>
+    </div>
+    <div class="metric-card">
+        <span>Active Days</span>
+        <strong>{{ stats.active_days }}</strong>
+    </div>
+</section>
+
+<section class="grid-two mt-4">
+    <div class="panel">
+        <div class="section-header">
+            <h2>System Backup</h2>
+            <a class="btn btn-primary btn-sm" href="{{ url_for('admin_backup') }}">Download Backup</a>
+        </div>
+        <p>Backups include all registered student images and attendance CSV files currently available in runtime storage.</p>
+    </div>
+
+    <div class="panel form-panel">
+        <h2>Clear Records by Date Range</h2>
+        <form method="post" action="{{ url_for('admin_clear_range') }}" class="stack">
+            <input type="date" name="start_date" class="form-control" value="{{ default_start }}" required>
+            <input type="date" name="end_date" class="form-control" value="{{ default_end }}" required>
+            <label class="checkbox-row">
+                <input type="checkbox" name="confirmed">
+                <span>I confirm this action cannot be undone.</span>
+            </label>
+            <button type="submit" class="btn btn-danger">Clear Records</button>
+        </form>
+    </div>
+</section>
+
+<section class="panel mt-4">
+    <h2>Student Management</h2>
+    {% if students %}
+    <div class="admin-student-list">
+        {% for student in students %}
+        <div class="admin-student-card">
+            <div>
+                <strong>{{ student }}</strong>
+                <div class="muted">Attendance Records: {{ student_records[student] }}</div>
+            </div>
+            <form method="post" action="{{ url_for('admin_remove_student') }}">
+                <input type="hidden" name="student_name" value="{{ student }}">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No students registered.</p>
+    {% endif %}
+</section>
+
+<section class="panel mt-4">
+    <h2>Recent Attendance Records</h2>
+    {% if stats.recent_records %}
+    <div class="table-responsive">
+        <table class="table table-dark table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Time</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in stats.recent_records %}
+                <tr>
+                    <td>{{ row.Name }}</td>
+                    <td>{{ row.Time }}</td>
+                    <td>{{ row.Date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state">No attendance records found.</p>
+    {% endif %}
+</section>
+{% endblock %}

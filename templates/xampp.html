@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block title %}XAMPP Version | Smart Attendance{% endblock %}
+{% block content %}
+<section class="grid-two mt-4">
+    <div class="panel">
+        <h2>About the XAMPP Version</h2>
+        <p>This repo includes a PHP/XAMPP variant for local Apache and MySQL setups.</p>
+        <ul class="feature-list">
+            <li>MySQL-backed attendance management</li>
+            <li>Registration and export tools</li>
+            <li>Migration path from the web app CSV data</li>
+            <li>Ready-made install scripts for local XAMPP</li>
+        </ul>
+    </div>
+
+    <div class="panel">
+        <h2>Downloads</h2>
+        {% if downloads %}
+        <div class="stack">
+            {% for item in downloads %}
+            <a class="btn btn-primary" href="{{ url_for('download_xampp_asset', filename=item.filename) }}">{{ item.label }}</a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No packaged downloads were found in this repo.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="panel mt-4">
+    <h2>Installation Notes</h2>
+    <ol class="instructions">
+        <li>Download and extract the XAMPP package.</li>
+        <li>Run the included install script for your platform.</li>
+        <li>Start Apache and MySQL in XAMPP.</li>
+        <li>Import `database_setup.sql` in phpMyAdmin.</li>
+        <li>Open `http://localhost/attendance_system`.</li>
+    </ol>
+</section>
+{% endblock %}

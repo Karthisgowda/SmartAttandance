@@ -1,50 +1,39 @@
-# Face Recognition Attendance System - Deployment Guide
+# Smart Attendance System - Vercel Deployment Guide
 
-This guide explains how to deploy the Face Recognition Attendance System to Render.com.
+This project now deploys to Vercel as a Flask application.
 
-## Render Deployment
+## Vercel Deployment
 
-### Quick Deploy
-1. Connect your repository to Render
-2. Use the following settings:
-   - **Environment**: Python 3
-   - **Build Command**: `pip install -r render-requirements.txt`
-   - **Start Command**: `streamlit run app.py --server.port=$PORT --server.address=0.0.0.0`
+### Build Behavior
+- Vercel detects the Flask app from `app.py`
+- Python dependencies are installed from `requirements.txt`
+- The application entrypoint is the Flask `app` object in `app.py`
 
-### Environment Variables
-Set the following environment variable in your Render dashboard:
+### Required Environment Variables
+- `ADMIN_PASSWORD`: password for admin access
+- `SESSION_SECRET`: secret key for Flask sessions
 
-- `ADMIN_PASSWORD`: Set a secure password for admin access (required)
+### Important Runtime Note
+- On Vercel, this app stores runtime data under `/tmp/smartattendance`
+- That means uploaded student photos and new attendance records are temporary unless you connect persistent storage
 
-### Files for Deployment
-- `render-requirements.txt` - Python dependencies
-- `render.yaml` - Render configuration (optional)
-- `Procfile` - Alternative start command configuration
-- `.streamlit/config.toml` - Streamlit configuration
+### Included Features
+- Student registration with image upload
+- Manual attendance marking
+- Attendance history and CSV export
+- Admin login and management panel
+- Backup generation
+- XAMPP package download page
 
-## Admin Panel
-- The admin panel is only visible to authenticated users
-- Default admin password is "admin123" (change using ADMIN_PASSWORD environment variable)
-- Admin features:
-  - View system statistics
-  - Manage students and attendance records
-  - Create system backups
-  - Delete records (admin only)
+### Local Run
+```bash
+python -m pip install -r requirements.txt
+python app.py
+```
 
-## Security Features
-- Password-protected admin panel
-- Environment variable configuration for secrets
-- Regular users cannot delete data
-- Admin authentication required for system management
+### Production URL
+After deployment, Vercel provides a project URL such as:
 
-## Data Persistence
-- Student images stored in `data/student_images/`
-- Attendance records stored in `data/attendance/`
-- All data persists across deployments
-- Admin can create full system backups
-
-## Troubleshooting
-- Ensure ADMIN_PASSWORD environment variable is set
-- Check that all required files are included in deployment
-- Verify Python version compatibility (3.8+)
-- Monitor deployment logs for any errors
+```text
+https://smartattandance.vercel.app
+```
